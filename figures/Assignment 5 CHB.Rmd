@@ -1,0 +1,81 @@
+---
+title: 'Assignment 5: Plots'
+author: "Callum Backstrom"
+date: "2023-02-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(ggplot2)
+library(tidyverse)
+```
+
+## Exploratory and Expository Plots of Fish Data
+
+As per the assignment instructions, see below for first an exploratory plot, and then an expository plot, based on the provided dataset of Siscowet Lake Trout.
+
+## I. Exploratory Figure: Length vs. Weight Relationship
+
+First, I will generate an exploratory figure plotting the length and weight of the fish, by sex, measured in the dataset:
+
+```{r exploratory plot 1, echo=TRUE}
+# First, a simple plot of length vs. weight, by sex, removing fish that were not assigned a sex:
+fish_data <- read.csv(here("data/siscowet.csv"))
+fish_data %>%
+  drop_na(sex) %>%
+        ggplot(aes(x=len,
+                   y=wgt,
+                   na.rm = TRUE,
+                   color=sex)) +
+        geom_point()
+# General Observations: there could be some interesting similarities (or differences) between male and female growth based on length and weight, but an obvious weight measurement error (a single fish weighing about 16,000 grams) obscures any specific trends in the data. 
+```
+
+```{r exploratory plot 2, echo=TRUE}
+# Now, the same plot, removing the outlier and natural log-transforming the weight data for linear relationships:
+fish_data <- read.csv(here("data/siscowet.csv")) #Reads in the data; from the csv tab, can organize rows by weight and find the row with the weight outlier
+fish_data <- subset(fish_data[-c(541), ]) #deletes row 541, where we clearly saw a data recording error of a weight value of 15,800 grams
+fish_data %>%
+  drop_na(sex) %>% # Removes data points with NA's for sex (i.e., that are not relevant to this figure)
+        ggplot(aes(x=len,
+                   y=log(wgt), #natural log-transforms the weight data to develop linear regressions with length data
+                   na.rm = TRUE,
+                   color=sex)) +
+        geom_point() + # Specifies that we want to show all of the data points in the plot 
+        geom_smooth(method = "lm", se = FALSE) # Adds linear regressions to both male and female data points
+# General Observations: there could be some interesting similarities (or differences) between male and female growth based on length and weight, but an obvious weight measurement error (a single fish weighing about 16,000 grams) obscures any specific trends in the data. 
+```
+
+
+
+
+
+
+## II. Expository Figure: 
+
+```{r expository plot 1, echo=TRUE}
+# Now, a more elaborate plot of the same data providing the information more clearly:
+fish_data <- read.csv(here("data/siscowet.csv")) #Reads in the data; from the csv tab, can organize rows by weight and find the row with the weight outlier
+fish_data <- subset(fish_data[-c(541), ]) #deletes row 541, where we clearly saw a data recording error of a weight value of 15,800 grams
+fish_data %>%
+  drop_na(sex) %>% # Removes data points with NA's for sex (i.e., that are not relevant to this figure)
+        ggplot(aes(x=len,
+                   y=log(wgt), #natural log-transforms the weight data to develop linear regressions with length data
+                   na.rm = TRUE,
+                   color=sex)) +
+        xlab("Total Length (mm)") +
+        ylab("Natural Log (Weight) (g)") +
+        geom_point(alpha = 0.5) + #Specifies that we want to show all of the data points in the plot 
+        theme_bw() + 
+        theme(panel.border = element_blank(), 
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(), 
+              axis.line = element_line(colour = "black")) +
+        geom_smooth(method = "lm", se = FALSE) + # Adds linear regressions to both male and female data points
+        theme(axis.title.y = element_text(angle = 0, vjust = 0.5,size=14),
+              axis.text = element_text(size=12)) +
+        theme(axis.title.x = element_text(angle = 0, vjust = 0.5,size=14),
+              axis.text = element_text(size=12))
+```
