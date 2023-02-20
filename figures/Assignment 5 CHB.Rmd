@@ -1,5 +1,5 @@
 ---
-title: 'Assignment 5: Plots'
+title: 'FISH 549, Assignment 5: Fish Measurement Plots'
 author: "Callum Backstrom"
 date: "2023-02-17"
 output: html_document
@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# The following libraries will be used to generate the plots from the data file:
 library(here)
 library(ggplot2)
 library(tidyverse)
@@ -30,7 +31,7 @@ fish_data %>%
                    na.rm = TRUE,
                    color=sex)) +
         geom_point()
-# General Observations: there could be some interesting similarities (or differences) between male and female growth based on length and weight, but an obvious weight measurement error (a single fish weighing about 16,000 grams) obscures any specific trends in the data. 
+# General Observations: there could be some interesting similarities (or differences) between male and female growth based on length and weight, but an obvious weight measurement error (a single fish weighing about 16,000 grams, with an unrealistic length of only 50 cm) obscures any specific trends in the data.
 ```
 
 ```{r exploratory plot 2, echo=TRUE}
@@ -40,18 +41,13 @@ fish_data <- subset(fish_data[-c(541), ]) #deletes row 541, where we clearly saw
 fish_data %>%
   drop_na(sex) %>% # Removes data points with NA's for sex (i.e., that are not relevant to this figure)
         ggplot(aes(x=len,
-                   y=log(wgt), #natural log-transforms the weight data to develop linear regressions with length data
+                   y=log(wgt), #natural log-transforms the weight data to develop linear regressions with length data (note: this might not be the most stats-correct transformation method, but I thought it was sufficient to compare both sexes of fish appyling the same transformation).
                    na.rm = TRUE,
                    color=sex)) +
         geom_point() + # Specifies that we want to show all of the data points in the plot 
         geom_smooth(method = "lm", se = FALSE) # Adds linear regressions to both male and female data points
-# General Observations: there could be some interesting similarities (or differences) between male and female growth based on length and weight, but an obvious weight measurement error (a single fish weighing about 16,000 grams) obscures any specific trends in the data. 
+# General Observations:  This plot much more clearly shows the virtually identical growth patterns of male and female Siscowet Lake Trout in terms of length and weight. We're ready to turn this figure into a more expository format.
 ```
-
-
-
-
-
 
 ## II. Expository Figure: 
 
@@ -62,20 +58,23 @@ fish_data <- subset(fish_data[-c(541), ]) #deletes row 541, where we clearly saw
 fish_data %>%
   drop_na(sex) %>% # Removes data points with NA's for sex (i.e., that are not relevant to this figure)
         ggplot(aes(x=len,
-                   y=log(wgt), #natural log-transforms the weight data to develop linear regressions with length data
+                   y=log(wgt), #natural log-transforms the weight data to develop linear regressions with length data (note: this might not be the most stats-correct transformation method, but I thought it was sufficient to compare both sexes of fish appyling the same transformation).
                    na.rm = TRUE,
                    color=sex)) +
         xlab("Total Length (mm)") +
         ylab("Natural Log (Weight) (g)") +
         geom_point(alpha = 0.5) + #Specifies that we want to show all of the data points in the plot 
         theme_bw() + 
+        scale_color_manual(values=c("#d8b365","#5ab4ac")) + #Colorblind-accessible scale via Colorbrewer 2.0
         theme(panel.border = element_blank(), 
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank(), 
-              axis.line = element_line(colour = "black")) +
+              axis.line = element_line(colour = "black")) + # Cleans up the plot to remove the grid
         geom_smooth(method = "lm", se = FALSE) + # Adds linear regressions to both male and female data points
         theme(axis.title.y = element_text(angle = 0, vjust = 0.5,size=14),
               axis.text = element_text(size=12)) +
         theme(axis.title.x = element_text(angle = 0, vjust = 0.5,size=14),
-              axis.text = element_text(size=12))
+              axis.text = element_text(size=12)) 
 ```
+
+This expository figure employs the following strategies covered in class and in Jeff Leek's demonstration: the axes are labeled in an informative way, the axes and internal graph space are clear and clean, data point opacity has been reduced to 50% to accentuate the linear regressions, and colors for contrast have been chosen according to ColorBrewer standards for colorblind-accessibility.
